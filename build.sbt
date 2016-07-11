@@ -27,13 +27,15 @@ val pomInfo = (
 )
 
 lazy val commonSettings = Seq(
+  logBuffered := false,
   version := "0.1.0",
   scalaVersion := "2.11.8",
-  organization := "intenthq.properties",
+  organization := "com.intenthq.properties",
   pomExtra := pomInfo,
   autoAPIMappings := true,
   publishArtifact in Test := false,
   pomIncludeRepository := { _ => false },
+  bintrayReleaseOnPublish := false,
   licenses += ("MIT", url("https://github.com/intenthq/scala-properties/blob/master/LICENSE")),
   resolvers ++= Seq(Resolver.sonatypeRepo("releases"), "Bintray jcenter" at "https://jcenter.bintray.com/"),
   libraryDependencies ++= Seq(
