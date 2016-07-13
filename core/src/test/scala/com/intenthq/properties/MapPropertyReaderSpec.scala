@@ -15,6 +15,11 @@ class SystemPropertyReaderSpec extends PropertyReaderSpec {
 }
 
 class CombinedPropertyReaderSpec extends PropertyReaderSpec {
+  override def missingError(key: String): String = {
+    val output = s"${classOf[MapPropertyReader].getSimpleName}: ${PropertyReader.MissingValueFormat.format(key)}"
+    s"$output\n$output"
+  }
+
   override def initReader: (Map[String, String]) => PropertyReader = map => {
     val first = map.take(map.size / 2)
     val second = map.drop(map.size / 2)
