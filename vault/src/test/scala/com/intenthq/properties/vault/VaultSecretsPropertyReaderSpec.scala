@@ -3,8 +3,8 @@ package com.intenthq.properties.vault
 import java.net.URL
 
 import com.intenthq.properties.{PropertyReader, PropertyReaderSpec}
-import janstenpickle.concurrent.result.AsyncResult
 import janstenpickle.vault.core.{Secrets, VaultConfig, WSClient}
+import uscala.concurrent.result.AsyncResult
 
 import scala.concurrent.ExecutionContext
 import scala.concurrent.ExecutionContext.Implicits.global

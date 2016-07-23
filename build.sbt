@@ -2,7 +2,7 @@ import sbt.Keys._
 
 name := "properties"
 
-val uscalaVersion = "0.2.2"
+val uscalaVersion = "0.3.1"
 val specs2Version = "3.7.2"
 
 val pomInfo = (
@@ -28,7 +28,7 @@ val pomInfo = (
 
 lazy val commonSettings = Seq(
   logBuffered := false,
-  version := "0.1.1",
+  version := "0.1.2",
   scalaVersion := "2.11.8",
   organization := "com.intenthq.properties",
   pomExtra := pomInfo,
@@ -67,7 +67,7 @@ lazy val core = (project in file("core")).
 
 lazy val vault = (project in file("vault")).
   settings(name := "scala-properties-vault").
-  settings(libraryDependencies += "janstenpickle.vault" %% "vault-core" % "0.3.0").
+  settings(libraryDependencies += "janstenpickle.vault" %% "vault-core" % "0.3.1").
   settings(commonSettings: _*).
   dependsOn(core % "compile->compile; test->test")
 
