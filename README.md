@@ -20,10 +20,10 @@ addSbtPlugin("me.lessis" % "bintray-sbt" % "0.3.0")
 Then add the following to your `build.sbt`
 ```scala
 resolvers += Resolver.bintrayRepo("janstenpickle", "maven")
-libraryDependencies += "com.intenthq.properties" %% "scala-properties-core" % "0.1.2"
-libraryDependencies += "com.intenthq.properties" %% "scala-properties-apache" % "0.1.2"
-libraryDependencies += "com.intenthq.properties" %% "scala-properties-hadoop" % "0.1.2"
-libraryDependencies += "com.intenthq.properties" %% "scala-properties-vault" % "0.1.2"
+libraryDependencies += "com.intenthq.properties" %% "scala-properties-core" % "0.1.3"
+libraryDependencies += "com.intenthq.properties" %% "scala-properties-apache" % "0.1.3"
+libraryDependencies += "com.intenthq.properties" %% "scala-properties-hadoop" % "0.1.3"
+libraryDependencies += "com.intenthq.properties" %% "scala-properties-vault" % "0.1.3"
 ```
 
 ## Usage
@@ -54,6 +54,7 @@ reader.optional[Int]("key") // returns Result[String, Option[Int]], failing if p
 |**CombinedPropertyReader** | scala-properties-core | Allows multiple property readers to be provided so many sources can be queried |
 |**ApachePropertyReader** | scala-properties-apache | Reads from any implementation of `org.apache.commons.configuration.AbstractConfiguration` |
 |**PropertyFileReader** | scala-properties-apache | Given an optional URL for locating a properties file will read properties from that location. If the URL is not supplied it will read the location of the file from a System Property (`property.file`) |
+|**HadoopPropertyReader** | scala-properties-hadoop | Reads properties from Hadoop configuration |
 |**VaultSecretsPropertyReader** | scala-properties-vault | Reads properties from the `secrets` storage in [Vault](http://vaultproject.io) |
 |**VaultCubbyHolePropertyReader** | scala-properties-vault | Reads properties from the `cubbyhole` storage in [Vault](http://vaultproject.io) |
 |**VaultSecretsNestedPropertyReader** | scala-properties-vault | Reads properties from the `secrets` storage in [Vault](http://vaultproject.io), where all the available properties are nested under a single key |

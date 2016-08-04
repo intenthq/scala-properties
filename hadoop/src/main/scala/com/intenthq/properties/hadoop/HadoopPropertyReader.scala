@@ -5,7 +5,7 @@ import org.apache.hadoop.conf.Configuration
 
 import scala.util.Try
 
-class HadoopPropertyReader(config: Configuration) extends PropertyReader {
+class HadoopPropertyReader(val config: Configuration) extends PropertyReader {
   override def readSafe(name: String): Option[String] =
     Try(Option(config.get(name))).toOption.flatten.filterNot(_ == "")
 }

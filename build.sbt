@@ -28,7 +28,7 @@ val pomInfo = (
 
 lazy val commonSettings = Seq(
   logBuffered := false,
-  version := "0.1.2",
+  version := "0.1.3",
   scalaVersion := "2.11.8",
   organization := "com.intenthq.properties",
   pomExtra := pomInfo,
