@@ -11,11 +11,11 @@ trait PropertyReader {
   def orError(name: String): Result[String, String] =
     Result.fromOption(readSafe(name), PropertyReader.MissingValueFormat.format(name))
 
-  def required[T](name: String)(implicit convert: String => Result[String, T]): Result[String, T] =
-    orError(name).flatMap(convert)
+  def required[T](name: String)(implicit conversion: StringConversion[T]): Result[String, T] =
+    orError(name).flatMap(conversion.parse)
 
-  def optional[T](name: String)(implicit convert: String => Result[String, T]): Result[String, Option[T]] =
-    readSafe(name).map(convert).fold[Result[String, Option[T]]](Ok(None))(_.map(Some(_)))
+  def optional[T](name: String)(implicit conversion: StringConversion[T]): Result[String, Option[T]] =
+    readSafe(name).map(conversion.parse).fold[Result[String, Option[T]]](Ok(None))(_.map(Some(_)))
 }
 
 object PropertyReader {
@@ -43,7 +43,7 @@ class CombinedReader (val readers: Set[PropertyReader]) extends PropertyReader {
   override def orError(name: String): Result[String, String] =
     collectErrors(readers.toSeq.map(r => (r.getClass.getSimpleName, r.orError(name))))
 
-  override def optional[T](name: String)(implicit convert: String => Result[String, T]): Result[String, Option[T]] = {
+  override def optional[T](name: String)(implicit conversion: StringConversion[T]): Result[String, Option[T]] = {
     val results = readers.toSeq.map(r => (r.getClass.getSimpleName, r.optional(name)))
     val filtered =
       if (results.exists(_._2.toEither.isLeft)) results.filter(_._2.toEither.isLeft) // if there are any errors then make sure there are no results so the user can see the errors

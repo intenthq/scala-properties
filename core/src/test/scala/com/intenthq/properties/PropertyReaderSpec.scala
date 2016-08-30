@@ -8,7 +8,6 @@ import uscala.result.specs2.ResultMatchers
 
 trait PropertyReaderSpec extends Specification with ScalaCheck with ResultMatchers {
   import PropertyReaderSpec._
-  import stringconversions._
 
   val identityMatch: MatchResult[Any] = true must beTrue
 
@@ -38,7 +37,7 @@ trait PropertyReaderSpec extends Specification with ScalaCheck with ResultMatche
   def initReader: Map[String, String] => PropertyReader
   def missingError(key: String): String = PropertyReader.MissingValueFormat.format(key)
 
-  def canReadString = Prop.forAllNoShrink(mapGen()) { props =>
+  def canReadString = Prop.forAll(mapGen()) { props =>
     val reader = initReader(props)
     props.keys.foldLeft[MatchResult[Any]](identityMatch)((acc, key) =>
       acc and
@@ -47,7 +46,7 @@ trait PropertyReaderSpec extends Specification with ScalaCheck with ResultMatche
     )
   }
 
-  def cannotReadString = Prop.forAllNoShrink(mapGen(), listGen()) { (props, keys) =>
+  def cannotReadString = Prop.forAll(mapGen(), listGen()) { (props, keys) =>
     val badKeys = keys.diff(props.keys.toSeq)
     val reader = initReader(props)
 
@@ -58,7 +57,7 @@ trait PropertyReaderSpec extends Specification with ScalaCheck with ResultMatche
     )
   }
 
-  def canFormat[T](gen: Gen[String], convertValue: String => T)(implicit convert: String => Result[String, T]) =
+  def canFormat[T](gen: Gen[String], convertValue: String => T)(implicit conversion: StringConversion[T]) =
     Prop.forAllNoShrink(mapGen(gen)) { props =>
       val reader = initReader(props)
 
@@ -69,7 +68,7 @@ trait PropertyReaderSpec extends Specification with ScalaCheck with ResultMatche
       )
     }
 
-  def cannotFormat[T](implicit convert: String => Result[String, T]) =
+  def cannotFormat[T](implicit conversion: StringConversion[T]) =
     Prop.forAllNoShrink(mapGen()) { props =>
       val reader = initReader(props)
 
@@ -80,7 +79,7 @@ trait PropertyReaderSpec extends Specification with ScalaCheck with ResultMatche
       )
     }
 
-  def notPresent[T](implicit convert: String => Result[String, T]) =
+  def notPresent[T](implicit conversion: StringConversion[T]) =
     Prop.forAllNoShrink(mapGen(), listGen()) { (props, keys) =>
       val badKeys = keys.diff(props.keys.toSeq)
       val reader = initReader(props)
