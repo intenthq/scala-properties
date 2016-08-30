@@ -6,16 +6,37 @@ import uscala.result.Result
 import uscala.result.Result.{Fail, Ok}
 
 trait PropertyReader {
-  def readSafe(name: String): Option[String]
+  /**
+    * Returns the value of the key with the given name as a string. Returns `None` if the key was not set, otherwise
+    * returns `Some(value)`.
+    */
+  def getAsString(name: String): Option[String]
 
-  def orError(name: String): Result[String, String] =
-    Result.fromOption(readSafe(name), PropertyReader.MissingValueFormat.format(name))
+  /**
+    * Returns the value of the key with the given name as a string. Returns `Result.Fail(err)` if the key was not set,
+    * otherwise returns `Result.Ok(value)`.
+    */
+  def getAsStringRequired(name: String): Result[String, String] =
+    Result.fromOption(getAsString(name), PropertyReader.MissingValueFormat.format(name))
 
-  def required[T](name: String)(implicit conversion: StringConversion[T]): Result[String, T] =
-    orError(name).flatMap(conversion.parse)
+  /**
+    * Returns the value of the key with the given name, applying any conversions needed.
+    *
+    * Will return a failure only if the property had a value and converting it failed, otherwise an `Ok(None)`. This
+    * allows you to show errors if a value is set incorrectly, otherwise provide a default value.
+    */
+  def get[T](name: String)(implicit conversion: StringConversion[T]): Result[String, Option[T]] =
+    getAsString(name).map(conversion.parse).fold[Result[String, Option[T]]](Ok(None))(_.map(Some(_)))
 
-  def optional[T](name: String)(implicit conversion: StringConversion[T]): Result[String, Option[T]] =
-    readSafe(name).map(conversion.parse).fold[Result[String, Option[T]]](Ok(None))(_.map(Some(_)))
+  /**
+    * Returns the value of the key with the given name, applying any conversions needed.
+    *
+    * This returns a failure if the property wasn't set, and if a property was set but it couldn't be converted. This
+    * allows you to show errors if a value is set incorrectly or if it was never set at all. Useful when you require
+    * a property to always be set.
+    */
+  def getRequired[T](name: String)(implicit conversion: StringConversion[T]): Result[String, T] =
+    getAsStringRequired(name).flatMap(conversion.parse)
 }
 
 object PropertyReader {
@@ -23,11 +44,11 @@ object PropertyReader {
 }
 
 class MapPropertyReader(val props: Map[String, String]) extends PropertyReader {
-  override def readSafe(name: String): Option[String] = props.get(name)
+  override def getAsString(name: String): Option[String] = props.get(name)
 }
 
 class SystemPropertyReader(val props: Properties = System.getProperties) extends PropertyReader {
-  override def readSafe(name: String): Option[String] = Option(props.getProperty(name)).filterNot(_ == "")
+  override def getAsString(name: String): Option[String] = Option(props.getProperty(name)).filterNot(_ == "")
 }
 
 class CombinedReader (val readers: Set[PropertyReader]) extends PropertyReader {
@@ -38,13 +59,13 @@ class CombinedReader (val readers: Set[PropertyReader]) extends PropertyReader {
       ).trim)
     )(_._2)
 
-  override def readSafe(name: String): Option[String] = readers.flatMap(reader => reader.readSafe(name)).headOption
+  override def getAsString(name: String): Option[String] = readers.flatMap(reader => reader.getAsString(name)).headOption
 
-  override def orError(name: String): Result[String, String] =
-    collectErrors(readers.toSeq.map(r => (r.getClass.getSimpleName, r.orError(name))))
+  override def getAsStringRequired(name: String): Result[String, String] =
+    collectErrors(readers.toSeq.map(r => (r.getClass.getSimpleName, r.getAsStringRequired(name))))
 
-  override def optional[T](name: String)(implicit conversion: StringConversion[T]): Result[String, Option[T]] = {
-    val results = readers.toSeq.map(r => (r.getClass.getSimpleName, r.optional(name)))
+  override def get[T](name: String)(implicit conversion: StringConversion[T]): Result[String, Option[T]] = {
+    val results = readers.toSeq.map(r => (r.getClass.getSimpleName, r.get(name)))
     val filtered =
       if (results.exists(_._2.toEither.isLeft)) results.filter(_._2.toEither.isLeft) // if there are any errors then make sure there are no results so the user can see the errors
       else if (results.exists(_._2.toOption.flatten.isDefined)) results.filter(_._2.toOption.flatten.isDefined) // if there are any valid results then filter out the `None`s

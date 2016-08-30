@@ -41,8 +41,8 @@ trait PropertyReaderSpec extends Specification with ScalaCheck with ResultMatche
     val reader = initReader(props)
     props.keys.foldLeft[MatchResult[Any]](identityMatch)((acc, key) =>
       acc and
-      (reader.readSafe(key) must beSome.like{ case v => v === props(key) }) and
-      (reader.orError(key) must beOk.like{ case v => v === props(key) })
+      (reader.getAsString(key) must beSome.like{ case v => v === props(key) }) and
+      (reader.getAsStringRequired(key) must beOk.like{ case v => v === props(key) })
     )
   }
 
@@ -52,8 +52,8 @@ trait PropertyReaderSpec extends Specification with ScalaCheck with ResultMatche
 
     badKeys.foldLeft[MatchResult[Any]](identityMatch)((acc, key) =>
       acc and
-      (reader.readSafe(key) must beNone) and
-      (reader.orError(key) must beFail.like{ case err => err === missingError(key) })
+      (reader.getAsString(key) must beNone) and
+      (reader.getAsStringRequired(key) must beFail.like{ case err => err === missingError(key) })
     )
   }
 
@@ -63,8 +63,8 @@ trait PropertyReaderSpec extends Specification with ScalaCheck with ResultMatche
 
       props.keys.foldLeft[MatchResult[Any]](identityMatch)((acc, key) =>
         acc and
-        (reader.required[T](key) must beOk.like{ case v => v === convertValue(props(key)) }) and
-        (reader.optional[T](key) must beOk.like{ case v => v must beSome.like { case a => a === convertValue(props(key)) } })
+        (reader.getRequired[T](key) must beOk.like{ case v => v === convertValue(props(key)) }) and
+        (reader.get[T](key) must beOk.like{ case v => v must beSome.like { case a => a === convertValue(props(key)) } })
       )
     }
 
@@ -74,8 +74,8 @@ trait PropertyReaderSpec extends Specification with ScalaCheck with ResultMatche
 
       props.keys.foldLeft[MatchResult[Any]](identityMatch)((acc, key) =>
         acc and
-        (reader.required[T](key) must beFail) and
-        (reader.optional[T](key) must beFail)
+        (reader.getRequired[T](key) must beFail) and
+        (reader.get[T](key) must beFail)
       )
     }
 
@@ -86,7 +86,7 @@ trait PropertyReaderSpec extends Specification with ScalaCheck with ResultMatche
 
       badKeys.foldLeft[MatchResult[Any]](identityMatch)((acc, key) =>
         acc and
-        (reader.optional[T](key) must beOk[Option[T]].like { case v => v must beNone })
+        (reader.get[T](key) must beOk[Option[T]].like { case v => v must beNone })
       )
     }
 }

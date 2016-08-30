@@ -23,11 +23,11 @@ trait VaultCubbyHole extends Vault {
 
 trait VaultPropertyReader extends Vault with PropertyReader {
 
-  override def readSafe(name: String): Option[String] = secrets.get(name).attemptRun(_.getMessage).toOption
+  override def getAsString(name: String): Option[String] = secrets.get(name).attemptRun(_.getMessage).toOption
 
-  override def orError(name: String): Result[String, String] = secrets.get(name).attemptRun(_.getMessage)
+  override def getAsStringRequired(name: String): Result[String, String] = secrets.get(name).attemptRun(_.getMessage)
 
-  override def optional[T](name: String)(implicit conversion: StringConversion[T]): Result[String, Option[T]] =
+  override def get[T](name: String)(implicit conversion: StringConversion[T]): Result[String, Option[T]] =
     secrets.get(name).
       attemptRun.
       fold[Result[String, Option[T]]](ex => Fail(ex.getMessage),
@@ -38,11 +38,11 @@ trait VaultPropertyReader extends Vault with PropertyReader {
 trait VaultNestedPropertyReader extends Vault with PropertyReader {
   def key: String
 
-  override def readSafe(name: String): Option[String] = secrets.get(key, name).attemptRun(_.getMessage).toOption
+  override def getAsString(name: String): Option[String] = secrets.get(key, name).attemptRun(_.getMessage).toOption
 
-  override def orError(name: String): Result[String, String] = secrets.get(key, name).attemptRun(_.getMessage)
+  override def getAsStringRequired(name: String): Result[String, String] = secrets.get(key, name).attemptRun(_.getMessage)
 
-  override def optional[T](name: String)(implicit conversion: StringConversion[T]): Result[String, Option[T]] =
+  override def get[T](name: String)(implicit conversion: StringConversion[T]): Result[String, Option[T]] =
     secrets.get(key, name).
       attemptRun.
       fold[Result[String, Option[T]]](ex => Fail(ex.getMessage),
