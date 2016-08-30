@@ -32,17 +32,16 @@ The property reader extensively uses functionality of the uscala `Result` type. 
 
 ```scala
 import com.intenthq.properties.MapPropertyReader
-import com.intenthq.properties.stringconversions._ // built in implicit string conversions (String => Result[String, T])
 
 val reader = new MapPropertyReader(Map("key" -> "value"))
 
-reader.readSafe("key") // returns Option[String]
+reader.getAsString("key") // returns Option[String]
 
-reader.orError("key") // returns Result[String, String]
+reader.getAsStringRequired("key") // returns Result[String, String]
 
-reader.required[Int]("key") // returns Result[String, Int], failing if the property is missing or parsing to the supplied type failed
+reader.getRequired[Int]("key") // returns Result[String, Int], failing if the property is missing or parsing to the supplied type failed
 
-reader.optional[Int]("key") // returns Result[String, Option[Int]], failing if parsing to the supplied type failed and `Ok[None]` if the property was missing
+reader.get[Int]("key") // returns Result[String, Option[Int]], failing if parsing to the supplied type failed and `Ok[None]` if the property was missing
 ```
 
 ## Provided Implementations
