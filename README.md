@@ -20,10 +20,10 @@ addSbtPlugin("me.lessis" % "bintray-sbt" % "0.3.0")
 Then add the following to your `build.sbt`
 ```scala
 resolvers += Resolver.bintrayRepo("janstenpickle", "maven")
-libraryDependencies += "com.intenthq.properties" %% "scala-properties-core" % "0.1.3"
-libraryDependencies += "com.intenthq.properties" %% "scala-properties-apache" % "0.1.3"
-libraryDependencies += "com.intenthq.properties" %% "scala-properties-hadoop" % "0.1.3"
-libraryDependencies += "com.intenthq.properties" %% "scala-properties-vault" % "0.1.3"
+libraryDependencies += "com.intenthq.properties" %% "scala-properties-core" % "1.0.0"
+libraryDependencies += "com.intenthq.properties" %% "scala-properties-apache" % "1.0.0"
+libraryDependencies += "com.intenthq.properties" %% "scala-properties-hadoop" % "1.0.0"
+libraryDependencies += "com.intenthq.properties" %% "scala-properties-vault" % "1.0.0"
 ```
 
 ## Usage
