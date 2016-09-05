@@ -7,7 +7,7 @@ import org.apache.commons.configuration.{AbstractConfiguration, PropertiesConfig
 import uscala.result.Result
 
 class ApachePropertyReader(config: AbstractConfiguration) extends PropertyReader {
-  override def readSafe(name: String): Option[String] = Option(config.getString(name))
+  override def getAsString(name: String): Option[String] = Option(config.getString(name))
 }
 
 object PropertyFileReader {
@@ -15,7 +15,7 @@ object PropertyFileReader {
 
   def apply(configUrl: Option[String]): Result[String, ApachePropertyReader] =
     for {
-      urlString <- configUrl.fold(new SystemPropertyReader().orError(PropertyFile))(Result.ok)
+      urlString <- configUrl.fold(new SystemPropertyReader().getAsStringRequired(PropertyFile))(Result.ok)
       url <- Result.attempt(URI.create(urlString).toURL).leftMap(_.getMessage)
     } yield new ApachePropertyReader(new PropertiesConfiguration(url))
 }
